@@ -188,7 +188,38 @@ def inferenceByVariableEliminationWithCallTracking(callTrackingList=None):
             eliminationOrder = sorted(list(eliminationVariables))
 
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # To clarify the evidenceVariables, queryVariables and hiddenVariables(elimateVariables)
+        evidenceVariablesSet = set(evidenceDict.keys())
+        queryVariablesSet = set(queryVariables)
+        
+        # grab all factors where we know the evidence variables (to reduce the size of the tables)
+        currentFactorsList = bayesNet.getAllCPTsWithEvidence(evidenceDict)
+
+        # join and eliminate all hidden factors by variable one by one
+        for hiddenVariable in eliminationOrder:
+            currentFactorsList, joinedFactor = joinFactorsByVariable(currentFactorsList, hiddenVariable)
+            # To eliminate the joinedFactor after joining the hiddenVarriable
+            
+            # If a factor that you are about to eliminate a variable from has 
+            # only one unconditioned variable, you should not eliminate it 
+            # and instead just discard the factor. 
+            if len(joinedFactor.unconditionedVariables()) == 1:
+                continue
+            
+            marginalizedFactor = eliminate(joinedFactor, hiddenVariable)
+            currentFactorsList.append(marginalizedFactor)
+
+        # currentFactorsList should contain the connected components of the graph now as factors, must join the connected components
+        fullJoint = joinFactors(currentFactorsList)
+
+        # normalize so that the probability sums to one
+        # the input factor contains only the query variables and the evidence variables, 
+        # both as unconditioned variables
+        queryConditionedOnEvidence = normalize(fullJoint)
+        # now the factor is conditioned on the evidence variables
+
+        # the order is join on all variables, then eliminate on all elimination variables
+        return queryConditionedOnEvidence
         "*** END YOUR CODE HERE ***"
 
 
