@@ -16,9 +16,9 @@ Solution to projects made by Gary Agasa and other materials of CS188 2023fall(In
   + [ ] discussion4
   + [x] discussion5
   + [x] discussion6
-  + [ ] discussion7
-  + [ ] discussion8
-  + [ ] discussion9
+  + [x] discussion7
+  + [x] discussion8
+  + [x] discussion9
   + [ ] discussion10  
   + [ ] discussion11
   + [ ] discussion12 
