@@ -3,10 +3,10 @@ Solution to projects made by Gary Agasa and other materials of CS188 2023fall(In
 [Course Website](https://inst.eecs.berkeley.edu/~cs188/fa23/)
 + Projects:
   + [x] Project 0
-  + [x] Project 1
+  + [x] Project 1 Search
   + [ ] Project 2
-  + [x] Project 3
-  + [ ] Project 4
+  + [x] Project 3 Reinforcement Learning
+  + [x] Project 4 Ghostbusters and Bayes Nets
   + [ ] Project 5
 + Homeworks(2020)(Not available yet)
 + Discussions:
