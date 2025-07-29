@@ -7,7 +7,7 @@ Solution to projects made by Gary Agasa and other materials of CS188 2023fall(In
   + [ ] Project 2
   + [x] Project 3 Reinforcement Learning
   + [x] Project 4 Ghostbusters and Bayes Nets
-  + [ ] Project 5
+  + [x] Project 5 Machine Learning(Digit Classification, Language Classification)
 + Homeworks(2020)(Not available yet)
 + Discussions:
   + [ ] discussion1
