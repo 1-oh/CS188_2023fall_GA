@@ -245,6 +245,22 @@ class LanguageIDModel(object):
 
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        #  h0--   h1--   h3-- ...   h_l-1   --> []  --> []  --> prediction
+        #  ^  |   ^  |   ^  | ...   ^     linear1  relu   linear2  
+        # g|  |  g|  |  g|  |  ... g|
+        #  z0 ->  z1 ->  z2 ->...-> z_l-1
+        #  ^  wh  ^  wh  ^  wh   wh ^
+        #  |      |      |          |
+        #  | wx   |wx    |wx        |wx
+        #  x0     x1     x2   ...   x_l-1
+        self.wx = nn.Parameter(47, 128)
+        self.wh = nn.Parameter(128, 128)
+        self.w1 = nn.Parameter(128, 512)
+        self.b1 = nn.Parameter(1, 512)
+        self.w2 = nn.Parameter(512, 5)
+        self.b2 = nn.Parameter(1, 5)
+        self.batch_size = 200
+        self.learning_rate = 0.01
 
     def run(self, xs):
         """
@@ -276,6 +292,29 @@ class LanguageIDModel(object):
                 (also called logits)
         """
         "*** YOUR CODE HERE ***"
+        # RNN architechture
+        is_initial = True
+        last_h = None
+        for each_word in xs:
+            if is_initial:
+                z0 = nn.Linear(each_word, self.wx)
+                last_h = nn.ReLU(z0)
+                is_initial = False
+            else:
+                z = nn.Add(nn.Linear(each_word, self.wx), nn.Linear(last_h, self.wh))
+                last_h = nn.ReLU(z)
+        
+        # Classify the language
+        # Linear Layer 1
+        w1x = nn.Linear(last_h, self.w1)
+        w1x_b1 = nn.AddBias(w1x, self.b1)
+        # Hidden Layer 1
+        x1 = nn.ReLU(w1x_b1)
+        # Linear Layer 2
+        w2x1 = nn.Linear(x1, self.w2)
+        w2x1_b2 = nn.AddBias(w2x1, self.b2)
+
+        return w2x1_b2
 
     def get_loss(self, xs, y):
         """
@@ -292,9 +331,24 @@ class LanguageIDModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SoftmaxLoss(self.run(xs), y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        for xs, y in dataset.iterate_forever(self.batch_size):
+            loss = self.get_loss(xs, y)
+            # gradient descent
+            grad_loss_wx, grad_loss_wh, grad_loss_w1, grad_loss_b1, grad_loss_w2, grad_loss_b2 = \
+                nn.gradients(loss, [self.wx, self.wh, self.w1, self.b1, self.w2, self.b2])
+            self.wx.update(grad_loss_wx, -self.learning_rate)
+            self.wh.update(grad_loss_wh, -self.learning_rate)
+            self.w1.update(grad_loss_w1, -self.learning_rate)
+            self.b1.update(grad_loss_b1, -self.learning_rate)
+            self.w2.update(grad_loss_w2, -self.learning_rate)
+            self.b2.update(grad_loss_b2, -self.learning_rate)
+            # determine whether to end traing
+            if dataset.get_validation_accuracy() > 0.9:
+                break
