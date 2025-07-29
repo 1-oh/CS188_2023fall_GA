@@ -64,6 +64,14 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        self.w1 = nn.Parameter(1, 512)
+        self.b1 = nn.Parameter(1, 512)
+        self.w2 = nn.Parameter(512, 128)
+        self.b2 = nn.Parameter(1, 128)
+        self.w3 = nn.Parameter(128, 1)
+        self.b3 = nn.Parameter(1, 1)
+        self.batch_size = 200
+        self.learning_rate = 0.01
 
     def run(self, x):
         """
@@ -75,6 +83,21 @@ class RegressionModel(object):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+        # Linear Layer 1
+        xw1 = nn.Linear(x, self.w1)
+        xw1_b1 = nn.AddBias(xw1, self.b1)
+        # Hidden Layer 1
+        x1 = nn.ReLU(xw1_b1)
+        # Linear Layer 2
+        x1w2 = nn.Linear(x1, self.w2)
+        x1w2_b2 = nn.AddBias(x1w2, self.b2)
+        # Hidden Layer 2
+        x2 = nn.ReLU(x1w2_b2)
+        # Linear Layer 3
+        x2w3 = nn.Linear(x2, self.w3)
+        x2w3_b3 = nn.AddBias(x2w3, self.b3)
+        
+        return x2w3_b3
 
     def get_loss(self, x, y):
         """
@@ -87,12 +110,28 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        return nn.SquareLoss(self.run(x), y)
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        for x, y in dataset.iterate_forever(self.batch_size):
+            loss = self.get_loss(x, y)
+            # determine whether to end traing
+            if nn.as_scalar(loss) < 0.01:
+                break
+            # gradient descent
+            grad_loss_w1, grad_loss_w2, grad_loss_w3, grad_loss_b1, grad_loss_b2, grad_loss_b3 = \
+                nn.gradients(loss, [self.w1, self.w2, self.w3, self.b1, self.b2, self.b3])
+            self.w1.update(grad_loss_w1, -self.learning_rate)
+            self.w2.update(grad_loss_w2, -self.learning_rate)
+            self.w3.update(grad_loss_w3, -self.learning_rate)
+            self.b1.update(grad_loss_b1, -self.learning_rate)
+            self.b2.update(grad_loss_b2, -self.learning_rate)
+            self.b3.update(grad_loss_b3, -self.learning_rate)
+        
 
 class DigitClassificationModel(object):
     """
