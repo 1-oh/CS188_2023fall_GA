@@ -288,7 +288,7 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
     def CalculateF(CurrentWithFW : StateWithFather):
         return problem.getCostOfActions(SolutionFinder(CurrentWithFW)) + heuristic(CurrentWithFW.currentState, problem)
     
-    # In the uniformCostSearch, we use the PriorityQueue with function "h(n)+g(n)" as fringe
+    # In the A* Search, we use the PriorityQueue with function "h(n)+g(n)" as fringe
     # Each time pop an element, we put its successors into the fringe
 
     # There should  be an "isFather" judgement, to avoid being stuck in
